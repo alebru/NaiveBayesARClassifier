@@ -1,6 +1,5 @@
 /* 
- * Author: Alexander Orhagen Brusmark (brusmark at gmail.com / alebr310 at student.liu.se)
- * 
+ * Author: Alexander Orhagen Brusmark (brusmark at gmail.com)
  */
 
 package textclassifier.abrusmark;
@@ -33,11 +32,11 @@ public class NB_Model {
 			e.printStackTrace();
 		}
 		
-		// Write object with ObjectOutputStream
+		/* Write object using ObjectOutputStream */
 		ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
 		
-		// Write object out to disk
-		System.out.println(trainingModel.featureFreqAllClasses + " - SAVED");
+		/* Write model (object) to disk */
+		System.out.println("Saved model");
 		obj_out.writeObject(trainingModel);
 		
 		f_out.close();
@@ -45,22 +44,19 @@ public class NB_Model {
 	}
 	
 	public void loadFromDisk() throws ClassNotFoundException, IOException {
-		// Read from disk using FileInputStream
+		/* Read from disk using FileInputStream */
 		FileInputStream f_in = new FileInputStream("model.dat");
 
-		// Read object using ObjectInputStream
+		/* Read object using ObjectInputStream */
 		ObjectInputStream obj_in = new ObjectInputStream (f_in);
 
-		// Read an object
+		/* Read an object */
 		Object obj = obj_in.readObject();
 		
 		if (obj instanceof Features) {
-			// Cast object to a Vector
-//			Vector vec = (Features) obj;
-			// Do something with vector....
 			Features mod = (Features) obj;
 			trainingModel = mod;
-			System.out.println(mod.featureFreqAllClasses + " - LOADED model");
+			System.out.println("Loaded model");
 		}
 	}
 }

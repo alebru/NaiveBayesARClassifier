@@ -1,6 +1,5 @@
 /* 
- * Author: Alexander Orhagen Brusmark (brusmark at gmail.com / alebr310 at student.liu.se)
- * 
+ * Author: Alexander Orhagen Brusmark (brusmark at gmail.com)
  */
 
 package textclassifier.abrusmark;
@@ -26,13 +25,13 @@ public class FeatureSelector
 	private Map<String, Integer> documentsByClassFreq;
 	private Map<String, Integer> termsByAllDocumentsCount;
 	private Map<String, Double> termsInDocumentsCount;
-	
+
 	int termCount;
 
 	String classLabel;
 	double tempCountWordsInClass;
 	double classProbabilityValue;
-	
+
 	double classProbability;
 	double termProbability;
 
@@ -45,11 +44,11 @@ public class FeatureSelector
 		allDocumentsFreq = new HashMap<String, Integer>();
 		documentsByClassFreq = new HashMap<String, Integer>();
 		termsByAllDocumentsCount = new HashMap<String, Integer>();
-		
-		
+
+
 		featureSet = new Features();
 		allClassesFreq = processedDocuments.getSortedClasses();
-		
+		featureSet.setAllClassesFreq(allClassesFreq);
 		FeatureSelector.goldstandard = processedDocuments.getGoldstandard();
 		FeatureSelector.allDocuments = processedDocuments.getAllDocuments();
 		FeatureSelector.documentsByClass = processedDocuments.getDocumentsByClass();
@@ -65,10 +64,10 @@ public class FeatureSelector
 		documentsByClassFreq = new HashMap<String, Integer>();
 		termsByAllDocumentsCount = new HashMap<String, Integer>();
 		goldstandard = processedDocuments.getGoldstandard();
-		
+
 		featureSet = new Features();
 		allClassesFreq = processedDocuments.getSortedClasses();
-
+		featureSet.setAllClassesFreq(allClassesFreq);
 		FeatureSelector.allDocuments = processedDocuments.getAllDocuments();
 		FeatureSelector.documentsByClass = processedDocuments.getDocumentsByClass();
 		FeatureSelector.uniqueDocuments = processedDocuments.getUniqueDocuments();
@@ -78,7 +77,7 @@ public class FeatureSelector
 		featuresByClass(); 
 		featuresProbPerClass();
 	}
-	
+
 	public Features returnFeatures() {
 		return featureSet;
 	}
@@ -93,10 +92,9 @@ public class FeatureSelector
 		for (Map.Entry<String, Double> entry : featureSet.freqOfClass.entrySet()) {
 			classProbability = Math.log(entry.getValue()/featureSet.featureFreqAllClasses);
 			entry.setValue(classProbability);
-//			System.out.println("I freqClasses: " + entry.getKey() + " - " + classProbability);
 		}
-		
-		
+
+
 	}
 
 	public void featuresByClass() {
@@ -108,13 +106,10 @@ public class FeatureSelector
 
 			for (String string : entry.getValue()) {
 				Integer count = Collections.frequency(entry.getValue(), string);
-				
+
 				termsInDocumentsCount.put(string, count.doubleValue() );
 			}
 			classProbabilityValue = featureSet.freqOfClass.get(classLabel).doubleValue();
-			
-//			System.out.println("I featuresByClass: " + classLabel + " - " + classProbabilityValue);
-			
 			classProb.put(classLabel, classProbabilityValue);
 			featureSet.featureFreqByClass.put(classProb, termsInDocumentsCount);
 		}
@@ -122,23 +117,16 @@ public class FeatureSelector
 
 	public void featuresProbPerClass() {
 		for (Map.Entry<Map<String, Double> , Map<String, Double>> entry : featureSet.featureFreqByClass.entrySet()) {
-			
+
 			for (Map.Entry<String, Double> innerEntry : entry.getValue().entrySet()) {
-//				System.out.println(innerEntry);
 				tempCountWordsInClass = 0;
 				for (Map.Entry<String, Double> wordFreqInClass: entry.getValue().entrySet()) {
 					tempCountWordsInClass += wordFreqInClass.getValue();
 				}
 				termProbability = Math.log((innerEntry.getValue()+1)/(tempCountWordsInClass+uniqueDocuments.size()));
-				
 				innerEntry.setValue(termProbability);   			
 			}	
 		}
-
-	}
-
-	public void printstuff() {
-		System.out.println(featureSet.featureFreqByClass);
 
 	}
 }

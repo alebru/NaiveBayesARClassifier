@@ -1,6 +1,5 @@
 /* 
- * Author: Alexander Orhagen Brusmark (brusmark at gmail.com / alebr310 at student.liu.se)
- * 
+ * Author: Alexander Orhagen Brusmark (brusmark at gmail.com)
  */
 
 package textclassifier.abrusmark;
