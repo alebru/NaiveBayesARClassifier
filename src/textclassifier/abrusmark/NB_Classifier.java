@@ -13,6 +13,7 @@ public class NB_Classifier {
 	private Map<Integer, String> goldStandard;
 	Map<Map<String, Double>, List<Double>> tempValues;
 	Map<Integer, List<String>> testData;
+	Map<String, Integer> sortedClasses;
 	Map<Integer, String> results;
 	Map<Integer, String> compare;
 	List<Double> listProbValues;
@@ -21,13 +22,18 @@ public class NB_Classifier {
 	Double probabilityCalc;
 	String bestClass;
 	double maxProbability;
-	
+
 	NB_Model ClassifierModel;
-	
+
 	String[] cmds;
 
-	
+
 	public NB_Classifier(String[] commands, FeatureSelector featureSet) {
+		ClassifierFeatures = featureSet.returnFeatures();
+		cmds = commands;
+	}
+
+	public NB_Classifier(String[] commands, FeatureSelectorTfidf featureSet) {
 		ClassifierFeatures = featureSet.returnFeatures();
 		cmds = commands;
 	}
@@ -37,9 +43,10 @@ public class NB_Classifier {
 		goldStandard = documentsProcessed.getGoldstandard();
 		cmds = commands;
 	}
-	
+
 	public NB_Classifier(String[] commands, TextProcessorStringdata documentsProcessed) {
 		testData = documentsProcessed.getTermsByDocuments();
+		sortedClasses = documentsProcessed.getSortedClasses();
 		goldStandard = documentsProcessed.getGoldstandard();
 		cmds = commands;
 	}
@@ -56,6 +63,7 @@ public class NB_Classifier {
 
 	public void train() {
 		ClassifierModel = new NB_Model(ClassifierFeatures);
+		System.out.println("\n");
 		System.out.println("Training classifier...");
 		try {
 			ClassifierModel.saveToDisk();
@@ -66,6 +74,7 @@ public class NB_Classifier {
 	}
 
 	public void test() {
+
 		try {
 			ClassifierModel = new NB_Model();
 			ClassifierModel.loadFromDisk();
@@ -73,27 +82,25 @@ public class NB_Classifier {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+		System.out.println("\n");
+		System.out.println("Running classifier...");
 
-		System.out.println("Running test...");
-		
 		results = new HashMap<Integer, String>();
 		compare = new HashMap<Integer, String>();
 		for (Map.Entry<Integer, List<String>> entry : testData.entrySet()) {
-			
+
 			tempValues = new HashMap<Map<String, Double>, List<Double>>();
-//			System.out.println("\n");
-//			System.out.println(entry.getKey());
 			maxProbability = 0.0;
-			
+
 			for (Map.Entry<Map<String, Double>, Map<String, Double>> entry2 : ClassifierModel.trainingModel.featureFreqByClass.entrySet()) {
 				listProbValues = new ArrayList<Double>();
-//				System.out.println(entry2.getKey().values().toArray()[0] + " - WHATYTOTTY!?!?");
+
 				priorProbClass = Double.valueOf(entry2.getKey().values().toArray()[0].toString());
-//				System.out.println("PriorProbabilityOfClass: " + priorProbClass);
-				
+
+
 				for (String wordTest : entry.getValue()) {
 					tempProbValue = 0.0;
-					
+
 					for (String wordModel : entry2.getValue().keySet()) {
 
 						if (wordTest.equalsIgnoreCase(wordModel)) {
@@ -101,62 +108,74 @@ public class NB_Classifier {
 							listProbValues.add(tempProbValue);
 						}
 					}
-					
+
 				}
-				
-//				System.out.println(entry2.getKey().keySet().toString() + listProbValues.size());
+
 				probabilityCalc = 0.0;
-				//Spara värden från test mot alla klasser
+				
+				/* The results of the probability calculations for each class are stored in listProbValues */
+				
 				if (listProbValues.size() > 0) {
-					
+
 					probabilityCalc = priorProbClass;
-//					System.out.println(listProbValues.get(0));
+
 					for (int i = 0; i < listProbValues.size(); i++) {
 						probabilityCalc += listProbValues.get(i);
 					}
-//					probabilityCalc *= priorProbClass;
-//					System.out.println(entry2.getKey().keySet().toString() + " :  " + probabilityCalc);
-					
 
-					
-//					tempValues.put(entry2.getKey(), probabilityCalc);
-//					System.out.println(listProbValues);
-//					System.out.println(listProbValues.size());
-//					System.out.println(Collections.max(listProbValues));
-				}
-//				bestClass = entry2.getKey().keySet().toArray()[0].toString();
-				
-				if (probabilityCalc < maxProbability) {
-					maxProbability = probabilityCalc;
-					bestClass = entry2.getKey().keySet().toArray()[0].toString();
 				}
 
-				//Hämta ut högsta värdet i listan - klassifikation klar
+				/* Checks to see if new probability value > previous probability, updates maxProbability accordingly*/
 
-				//				for (Map.Entry<String, List<Double>> entry3 : tempValues.entrySet()) {
-				//					
-//					System.out.println(entry3.getKey() + " : " + entry3.getValue());
-//					}
+				if (cmds[3].equalsIgnoreCase("tfidf")) {
+					if (probabilityCalc > maxProbability) {
+						maxProbability = probabilityCalc;
+						bestClass = entry2.getKey().keySet().toArray()[0].toString();
+					}
 				}
-			results.put(entry.getKey(), bestClass);
-//				System.out.println(entry.getKey() + ": " + bestClass);
-//				results.put(entry.getKey(), Collections.max(tempValues));
+				else {
+					if (probabilityCalc < maxProbability) {
+						maxProbability = probabilityCalc;
+						bestClass = entry2.getKey().keySet().toArray()[0].toString();
+					}
+				}
 			}
+			results.put(entry.getKey(), bestClass);
+		}
 		Double correct = 0.0;
 		Double accuracy = 0.0;
-		
+
 		for (Map.Entry<Integer, String> entry : results.entrySet()) {
-			
+
 			for (Map.Entry<Integer, String> entry2: goldStandard.entrySet()) {
-				
+
 				if ((entry.getKey().equals(entry2.getKey()) && (entry.getValue().equals(entry2.getValue())))) {
 					correct++;
 				}
 			}
 		}
-		System.out.println("Accuracy: " + correct/results.size());
-			
-			
-//			System.out.println(entry.getKey() + ": "+entry.getValue());
-		}
+		
+		accuracy = correct/results.size();
+		double percent = Math.round((100.0 * accuracy));
+		
+		
+		
+		System.out.println("\n");
+		System.out.println("Input: " + cmds[1]);
+		System.out.println("\n");
+		System.out.println("--------------------------------------------------------------");
+		System.out.println("#Documents in training data: " +"\t" + ClassifierModel.trainingModel.featureFreqAllClasses);
+		System.out.println("#Classes in training data: " +"\t" +ClassifierModel.trainingModel.getAllClassesFreq().size());
+		System.out.println("\n");
+		System.out.println("#Documents in test data: " +"\t" + testData.size());
+		System.out.println("#Classes in test data: " +"\t\t" +ClassifierModel.trainingModel.getAllClassesFreq().size());
+		System.out.println("\n");
+		System.out.println("Cut-off:" +"\t" + cmds[2]);
+		System.out.println("Term-weighting:" +"\t" + cmds[3]);
+		System.out.println("\n");
+		System.out.println("Accuracy:" + "\t" + String.format("%.0f%%",percent)+ " (" + accuracy+")");
+		System.out.println("--------------------------------------------------------------");
+		System.out.println("\n");
+		System.out.println("\n");
+	}
 }

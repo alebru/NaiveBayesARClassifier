@@ -1,6 +1,5 @@
 /* 
- * Author: Alexander Orhagen Brusmark (brusmark at gmail.com / alebr310 at student.liu.se)
- * 
+ * Author: Alexander Orhagen Brusmark (brusmark at gmail.com)
  */
 
 package textclassifier.abrusmark;
@@ -49,7 +48,7 @@ public class FeatureSelector
 		
 		featureSet = new Features();
 		allClassesFreq = processedDocuments.getSortedClasses();
-		
+		featureSet.setAllClassesFreq(allClassesFreq);
 		FeatureSelector.goldstandard = processedDocuments.getGoldstandard();
 		FeatureSelector.allDocuments = processedDocuments.getAllDocuments();
 		FeatureSelector.documentsByClass = processedDocuments.getDocumentsByClass();
@@ -68,7 +67,7 @@ public class FeatureSelector
 		
 		featureSet = new Features();
 		allClassesFreq = processedDocuments.getSortedClasses();
-
+		featureSet.setAllClassesFreq(allClassesFreq);
 		FeatureSelector.allDocuments = processedDocuments.getAllDocuments();
 		FeatureSelector.documentsByClass = processedDocuments.getDocumentsByClass();
 		FeatureSelector.uniqueDocuments = processedDocuments.getUniqueDocuments();
@@ -93,7 +92,6 @@ public class FeatureSelector
 		for (Map.Entry<String, Double> entry : featureSet.freqOfClass.entrySet()) {
 			classProbability = Math.log(entry.getValue()/featureSet.featureFreqAllClasses);
 			entry.setValue(classProbability);
-//			System.out.println("I freqClasses: " + entry.getKey() + " - " + classProbability);
 		}
 		
 		
@@ -112,9 +110,6 @@ public class FeatureSelector
 				termsInDocumentsCount.put(string, count.doubleValue() );
 			}
 			classProbabilityValue = featureSet.freqOfClass.get(classLabel).doubleValue();
-			
-//			System.out.println("I featuresByClass: " + classLabel + " - " + classProbabilityValue);
-			
 			classProb.put(classLabel, classProbabilityValue);
 			featureSet.featureFreqByClass.put(classProb, termsInDocumentsCount);
 		}
@@ -124,13 +119,11 @@ public class FeatureSelector
 		for (Map.Entry<Map<String, Double> , Map<String, Double>> entry : featureSet.featureFreqByClass.entrySet()) {
 			
 			for (Map.Entry<String, Double> innerEntry : entry.getValue().entrySet()) {
-//				System.out.println(innerEntry);
 				tempCountWordsInClass = 0;
 				for (Map.Entry<String, Double> wordFreqInClass: entry.getValue().entrySet()) {
 					tempCountWordsInClass += wordFreqInClass.getValue();
 				}
 				termProbability = Math.log((innerEntry.getValue()+1)/(tempCountWordsInClass+uniqueDocuments.size()));
-				
 				innerEntry.setValue(termProbability);   			
 			}	
 		}

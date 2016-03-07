@@ -1,6 +1,5 @@
 /* 
- * Author: Alexander Orhagen Brusmark (brusmark at gmail.com / alebr310 at student.liu.se)
- * 
+ * Author: Alexander Orhagen Brusmark (brusmark at gmail.com)
  */
 
 package textclassifier.abrusmark;
@@ -37,7 +36,7 @@ public class NB_Model {
 		ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
 		
 		// Write object out to disk
-		System.out.println(trainingModel.featureFreqAllClasses + " - SAVED");
+		System.out.println("Saved model");
 		obj_out.writeObject(trainingModel);
 		
 		f_out.close();
@@ -60,7 +59,7 @@ public class NB_Model {
 			// Do something with vector....
 			Features mod = (Features) obj;
 			trainingModel = mod;
-			System.out.println(mod.featureFreqAllClasses + " - LOADED model");
+			System.out.println("Loaded model");
 		}
 	}
 }

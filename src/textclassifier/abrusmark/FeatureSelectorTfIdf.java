@@ -1,6 +1,5 @@
 /* 
- * Author: Alexander Orhagen Brusmark (brusmark at gmail.com / alebr310 at student.liu.se)
- * 
+ * Author: Alexander Orhagen Brusmark (brusmark at gmail.com)
  */
 
 package textclassifier.abrusmark;
@@ -11,13 +10,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.List;
 
-public class FeatureSelectorTfIdf
+public class FeatureSelectorTfidf
 {
 	private static List<String> allDocuments;
 	private static Map<String, List<String>> documentsByClass;
 	private static HashSet<String> uniqueDocuments;
 	private static Map<Integer, List<String>> termsByDocuments;
 	private static Map<Integer, String> goldstandard;
+	private Map<String, Integer> termFreqAllDocuments;
 	private Features featureSet;
 
 	private Map<String, Integer> allDocumentsFreq;
@@ -37,11 +37,11 @@ public class FeatureSelectorTfIdf
 	double termProbability;
 
 	static {
-		FeatureSelectorTfIdf.allDocuments = null;
-		FeatureSelectorTfIdf.documentsByClass = null;
-		FeatureSelectorTfIdf.uniqueDocuments = null;
+		FeatureSelectorTfidf.allDocuments = null;
+		FeatureSelectorTfidf.documentsByClass = null;
+		FeatureSelectorTfidf.uniqueDocuments = null;
 	}
-	public FeatureSelectorTfIdf(TextProcessor processedDocuments) {
+	public FeatureSelectorTfidf(TextProcessor processedDocuments) {
 		allDocumentsFreq = new HashMap<String, Integer>();
 		documentsByClassFreq = new HashMap<String, Integer>();
 		termsByAllDocumentsCount = new HashMap<String, Integer>();
@@ -50,17 +50,16 @@ public class FeatureSelectorTfIdf
 		featureSet = new Features();
 		allClassesFreq = processedDocuments.getSortedClasses();
 		
-		FeatureSelectorTfIdf.goldstandard = processedDocuments.getGoldstandard();
-		FeatureSelectorTfIdf.allDocuments = processedDocuments.getAllDocuments();
-		FeatureSelectorTfIdf.documentsByClass = processedDocuments.getDocumentsByClass();
-		FeatureSelectorTfIdf.uniqueDocuments = processedDocuments.getUniqueDocuments();
-		FeatureSelectorTfIdf.termsByDocuments = processedDocuments.getTermsByDocuments();
-
+		FeatureSelectorTfidf.goldstandard = processedDocuments.getGoldstandard();
+		FeatureSelectorTfidf.allDocuments = processedDocuments.getAllDocuments();
+		FeatureSelectorTfidf.documentsByClass = processedDocuments.getDocumentsByClass();
+		FeatureSelectorTfidf.uniqueDocuments = processedDocuments.getUniqueDocuments();
+		FeatureSelectorTfidf.termsByDocuments = processedDocuments.getTermsByDocuments();
 		freqClasses();
 		featuresByClass(); 
 		featuresProbPerClass();
 	}
-	public FeatureSelectorTfIdf(TextProcessorStringdata processedDocuments) {
+	public FeatureSelectorTfidf(TextProcessorStringdata processedDocuments) {
 		allDocumentsFreq = new HashMap<String, Integer>();
 		documentsByClassFreq = new HashMap<String, Integer>();
 		termsByAllDocumentsCount = new HashMap<String, Integer>();
@@ -68,11 +67,13 @@ public class FeatureSelectorTfIdf
 		
 		featureSet = new Features();
 		allClassesFreq = processedDocuments.getSortedClasses();
+		featureSet.setAllClassesFreq(allClassesFreq);
+		termFreqAllDocuments = processedDocuments.getTermFreqAllDocuments();
 
-		FeatureSelectorTfIdf.allDocuments = processedDocuments.getAllDocuments();
-		FeatureSelectorTfIdf.documentsByClass = processedDocuments.getDocumentsByClass();
-		FeatureSelectorTfIdf.uniqueDocuments = processedDocuments.getUniqueDocuments();
-		FeatureSelectorTfIdf.termsByDocuments = processedDocuments.getTermsByDocuments();
+		FeatureSelectorTfidf.allDocuments = processedDocuments.getAllDocuments();
+		FeatureSelectorTfidf.documentsByClass = processedDocuments.getDocumentsByClass();
+		FeatureSelectorTfidf.uniqueDocuments = processedDocuments.getUniqueDocuments();
+		FeatureSelectorTfidf.termsByDocuments = processedDocuments.getTermsByDocuments();
 
 		freqClasses();
 		featuresByClass(); 
@@ -93,7 +94,6 @@ public class FeatureSelectorTfIdf
 		for (Map.Entry<String, Double> entry : featureSet.freqOfClass.entrySet()) {
 			classProbability = Math.log(entry.getValue()/featureSet.featureFreqAllClasses);
 			entry.setValue(classProbability);
-//			System.out.println("I freqClasses: " + entry.getKey() + " - " + classProbability);
 		}
 		
 		
@@ -109,12 +109,9 @@ public class FeatureSelectorTfIdf
 			for (String string : entry.getValue()) {
 				Integer count = Collections.frequency(entry.getValue(), string);
 				
-				termsInDocumentsCount.put(string, count.doubleValue() );
+				termsInDocumentsCount.put(string, count.doubleValue());
 			}
 			classProbabilityValue = featureSet.freqOfClass.get(classLabel).doubleValue();
-			
-//			System.out.println("I featuresByClass: " + classLabel + " - " + classProbabilityValue);
-			
 			classProb.put(classLabel, classProbabilityValue);
 			featureSet.featureFreqByClass.put(classProb, termsInDocumentsCount);
 		}
@@ -124,13 +121,13 @@ public class FeatureSelectorTfIdf
 		for (Map.Entry<Map<String, Double> , Map<String, Double>> entry : featureSet.featureFreqByClass.entrySet()) {
 			
 			for (Map.Entry<String, Double> innerEntry : entry.getValue().entrySet()) {
-//				System.out.println(innerEntry);
+
 				tempCountWordsInClass = 0;
 				for (Map.Entry<String, Double> wordFreqInClass: entry.getValue().entrySet()) {
 					tempCountWordsInClass += wordFreqInClass.getValue();
 				}
-				termProbability = Math.log((innerEntry.getValue()+1)/(tempCountWordsInClass+uniqueDocuments.size()));
-				
+			
+				termProbability = (innerEntry.getValue() * Math.log((uniqueDocuments.size()/termFreqAllDocuments.get(innerEntry.getKey()))));
 				innerEntry.setValue(termProbability);   			
 			}	
 		}

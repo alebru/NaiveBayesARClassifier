@@ -1,5 +1,17 @@
 /* 
- * Author: Alexander Orhagen Brusmark (brusmark at gmail.com / alebr310 at student.liu.se)
+ * Author: Alexander Orhagen Brusmark (brusmark at gmail.com)
+ */
+
+
+/* How to use:
+ * 
+ * As jar file:
+ * 
+ * java -jar [nameofjar].jar [traintest|train|test] [dataset.csv] [exclusion cutoff for classes (integer value)] [freq|tfidf]
+ * 
+ * Example:
+ * 
+ * java -jar classifier.jar traintest bug_reports.csv 30 tfidf
  * 
  */
 
@@ -11,23 +23,40 @@ public class ReportClassifier
 	public static String[] commands;
 
 	public static void main(final String[] args) {
-
-		commands = new String[3];
-
+		commands = new String[4];
+		commands[1] = args[1];
+		commands[2] = args[2];
+		commands[3] = args[3];
+		
+		
 		if (args[0].equalsIgnoreCase("traintest")) {
+			
+			
+			
 			final DataSampling sampleAndSplit = new DataSampling(args[0], args[2], args[1]);
 			
-			final TextProcessorStringdata trainingSet = new TextProcessorStringdata("train", sampleAndSplit.trainingSet);
+			final TextProcessorStringdata trainingSet = new TextProcessorStringdata("train", args[3], sampleAndSplit.trainingSet);
 			final TextProcessorStringdata trainingSetProcessed = trainingSet.returnDocuments();
 			
-			final FeatureSelector featureSet = new FeatureSelector(trainingSetProcessed);
-			final NB_Classifier classifierTrainInstance = new NB_Classifier(commands, featureSet);
-			classifierTrainInstance.train();
-		
-			final TextProcessorStringdata testSet = new TextProcessorStringdata("test", sampleAndSplit.testSet);
+			if (args[3].equalsIgnoreCase("tfidf")) {
+				final FeatureSelectorTfidf featureSet = new FeatureSelectorTfidf(trainingSetProcessed);
+				
+				final NB_Classifier classifierTrainInstance = new NB_Classifier(commands, featureSet);
+				classifierTrainInstance.train();
+			}
+			if ((args[3].equalsIgnoreCase("freq"))){
+				final FeatureSelector featureSet = new FeatureSelector(trainingSetProcessed);
+				
+				final NB_Classifier classifierTrainInstance = new NB_Classifier(commands, featureSet);
+				classifierTrainInstance.train();
+			}
+			
+			final TextProcessorStringdata testSet = new TextProcessorStringdata("test", args[3], sampleAndSplit.testSet);
+			
+			/* If argument "tfidf" is passed, NB_Classifier runs tfidf-evaluation */
+			
 			final NB_Classifier classifierTestInstance = new NB_Classifier(commands, testSet);
 			classifierTestInstance.test();
-			
 		}
 
 		if (args[0].equalsIgnoreCase("train")) {
@@ -36,7 +65,7 @@ public class ReportClassifier
 			final TextProcessor documentsProcessed = documentsInstance.returnDocuments();
 			final FeatureSelector featureSet = new FeatureSelector(documentsProcessed);
 			final NB_Classifier classifierInstance = new NB_Classifier(commands, featureSet);
-
+			
 			classifierInstance.train();
 		}
 
@@ -47,7 +76,7 @@ public class ReportClassifier
 			final TextProcessor documentsInstance = new TextProcessor(args[0], args[1]);
 			final TextProcessor documentsProcessed = documentsInstance.returnDocuments();
 			final NB_Classifier classifierInstance = new NB_Classifier(commands, documentsProcessed);
-
+			
 			classifierInstance.test();
 		}
 
