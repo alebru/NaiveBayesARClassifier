@@ -173,7 +173,7 @@ public class NB_Classifier {
 		System.out.println("Cut-off:" +"\t" + cmds[2]);
 		System.out.println("Term-weighting:" +"\t" + cmds[3]);
 		System.out.println("\n");
-		System.out.println("Accuracy:" + "\t" + String.format("%.0f%%",percent)+ " (" + accuracy+")");
+		System.out.println("Accuracy:" + "\t" + String.format("%.0f %%",percent)+ "  (" + accuracy+")");
 		System.out.println("--------------------------------------------------------------");
 		System.out.println("\n");
 		System.out.println("\n");
