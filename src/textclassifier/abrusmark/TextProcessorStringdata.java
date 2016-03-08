@@ -74,6 +74,7 @@ public class TextProcessorStringdata {
 		dataSc = new Scanner(textData);
 
 		/* While (data.Sc.hasNextLine == true) */
+		
 
 		while ((dataSc.hasNextLine())) {
 			tempTermList = new ArrayList<String>();
@@ -81,7 +82,6 @@ public class TextProcessorStringdata {
 			line = dataSc.nextLine();
 
 			/* Split the line into columns, use "," as delimiter */
-
 			final String[] cols = line.split(",");
 
 			for (int i = 0; i < 1; ++i) {
@@ -114,12 +114,11 @@ public class TextProcessorStringdata {
 
 						/* TF-IDF weight calculation (if option 'tfidf' passed as argument)
 						 * The sum of documents containing words in vocabulary */
-
+						
 						if (weightMethod.equalsIgnoreCase("tfidf") && option.equalsIgnoreCase("train")) {
 							allDocuments.add(string);
 							documentsByClass.get(cols[3]).add(string);
 							tempTermList.add(string);
-
 
 							if (termFreqAllDocuments.containsKey(string)) {
 								newFreqValue = 0;
@@ -131,26 +130,24 @@ public class TextProcessorStringdata {
 							else {
 								termFreqAllDocuments.put(string, 1);
 							}
-
-
 						}
-
 					}
 
 					/* The id of the current document and the class
 					 * of corresponding to the document are added to 
 					 * goldstandard (HashMap<Integer, String>)
 					 */
-
+					
 					String idOfDoc = cols[0].replaceAll("\"", "");
 					goldstandard.put(Integer.valueOf(idOfDoc), cols[3]);
 				} 
 
+			
 				/* If documentsByClass does contain the class (String),
 				 * The terms (strings) in the document are added to 
 				 * 'allDocuments' (ArrayList<String>) as string values.
 				 */
-
+			
 				else {
 					for (String string : tempDoc) {
 						string = string.replaceAll(
@@ -159,6 +156,7 @@ public class TextProcessorStringdata {
 						string = string.replaceAll("\"", "");
 						string = string.toLowerCase();
 						if(!stopWords.contains(string) && (weightMethod.equalsIgnoreCase("freq") || option.equalsIgnoreCase("test"))) {
+
 							allDocuments.add(string);
 							documentsByClass.get(cols[3]).add(string);
 							tempTermList.add(string);
@@ -171,6 +169,7 @@ public class TextProcessorStringdata {
 							allDocuments.add(string);
 							documentsByClass.get(cols[3]).add(string);
 							tempTermList.add(string);
+
 							if (termFreqAllDocuments.containsKey(string)) {
 								newFreqValue = 0;
 								newFreqValue = termFreqAllDocuments.get(string);
@@ -187,23 +186,22 @@ public class TextProcessorStringdata {
 					 * of corresponding to the document are added to 
 					 * goldstandard (HashMap<Integer, String>)
 					 */
-
+					
 					String idOfDoc = cols[0].replaceAll("\"", "");
 					goldstandard.put(Integer.valueOf(idOfDoc), cols[3]);
 				}
 
 				if (option.equalsIgnoreCase("test")) {
 					Collections.sort(tempTermList);
-					//					String idOfDoc = cols[0].replaceAll("\"", "");
 					termsByDocuments.put(Integer.valueOf(cols[0]), tempTermList);
 				}
 
 			}
 
+
 			/* For uniqueClasses (List<String>) - if the current documents corresponding class
 			 * is not stored in uniqueClasses, the value of 'cols[3]' (the class name) is added
 			 */
-
 			if (!uniqueClasses.contains(cols[3])) {
 				uniqueClasses.add(cols[3]);
 			}

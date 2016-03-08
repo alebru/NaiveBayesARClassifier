@@ -49,7 +49,6 @@ public class FeatureSelectorTfidf
 
 		featureSet = new Features();
 		allClassesFreq = processedDocuments.getSortedClasses();
-
 		FeatureSelectorTfidf.goldstandard = processedDocuments.getGoldstandard();
 		FeatureSelectorTfidf.allDocuments = processedDocuments.getAllDocuments();
 		FeatureSelectorTfidf.documentsByClass = processedDocuments.getDocumentsByClass();
@@ -108,7 +107,6 @@ public class FeatureSelectorTfidf
 
 			for (String string : entry.getValue()) {
 				Integer count = Collections.frequency(entry.getValue(), string);
-
 				termsInDocumentsCount.put(string, count.doubleValue());
 			}
 			classProbabilityValue = featureSet.freqOfClass.get(classLabel).doubleValue();
@@ -126,7 +124,6 @@ public class FeatureSelectorTfidf
 				for (Map.Entry<String, Double> wordFreqInClass: entry.getValue().entrySet()) {
 					tempCountWordsInClass += wordFreqInClass.getValue();
 				}
-
 				termProbability = (innerEntry.getValue() * Math.log((uniqueDocuments.size()/termFreqAllDocuments.get(innerEntry.getKey()))));
 				innerEntry.setValue(termProbability);   			
 			}	

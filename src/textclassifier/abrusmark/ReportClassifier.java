@@ -26,32 +26,27 @@ public class ReportClassifier
 		commands[1] = args[1];
 		commands[2] = args[2];
 		commands[3] = args[3];
-
-
+		
 		if (args[0].equalsIgnoreCase("traintest")) {
 
-
-
 			final DataSampling sampleAndSplit = new DataSampling(args[0], args[2], args[1]);
-
+			
 			final TextProcessorStringdata trainingSet = new TextProcessorStringdata("train", args[3], sampleAndSplit.trainingSet);
 			final TextProcessorStringdata trainingSetProcessed = trainingSet.returnDocuments();
-
+			
 			if (args[3].equalsIgnoreCase("tfidf")) {
 				final FeatureSelectorTfidf featureSet = new FeatureSelectorTfidf(trainingSetProcessed);
-
 				final NB_Classifier classifierTrainInstance = new NB_Classifier(commands, featureSet);
 				classifierTrainInstance.train();
 			}
 			if ((args[3].equalsIgnoreCase("freq"))){
 				final FeatureSelector featureSet = new FeatureSelector(trainingSetProcessed);
-
 				final NB_Classifier classifierTrainInstance = new NB_Classifier(commands, featureSet);
 				classifierTrainInstance.train();
 			}
-
+			
 			final TextProcessorStringdata testSet = new TextProcessorStringdata("test", args[3], sampleAndSplit.testSet);
-
+			
 			/* If argument "tfidf" is passed, NB_Classifier runs tfidf-evaluation */
 
 			final NB_Classifier classifierTestInstance = new NB_Classifier(commands, testSet);
@@ -64,18 +59,18 @@ public class ReportClassifier
 			final TextProcessor documentsProcessed = documentsInstance.returnDocuments();
 			final FeatureSelector featureSet = new FeatureSelector(documentsProcessed);
 			final NB_Classifier classifierInstance = new NB_Classifier(commands, featureSet);
-
+			
 			classifierInstance.train();
 		}
 
 		if (args[0].equalsIgnoreCase("test")) {
 			commands[0] = args[0];
 			commands[1] = args[1];
-			//        	commands[2] = args[2];
+		
 			final TextProcessor documentsInstance = new TextProcessor(args[0], args[1]);
 			final TextProcessor documentsProcessed = documentsInstance.returnDocuments();
 			final NB_Classifier classifierInstance = new NB_Classifier(commands, documentsProcessed);
-
+			
 			classifierInstance.test();
 		}
 

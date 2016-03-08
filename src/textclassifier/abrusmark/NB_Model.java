@@ -34,7 +34,7 @@ public class NB_Model {
 		
 		/* Write object using ObjectOutputStream */
 		ObjectOutputStream obj_out = new ObjectOutputStream (f_out);
-		
+
 		/* Write model (object) to disk */
 		System.out.println("Saved model");
 		obj_out.writeObject(trainingModel);
