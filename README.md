@@ -2,11 +2,11 @@
 
 **Alexander Brusmark** (brusmark@gmail.com)
 
-*A classifier for bug reports based on the Naive Bayes method (for use with bugzilla CSV-format bug report data)*
+*A classifier for bug reports based on the [Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) method (for use with bugzilla CSV-format bug report data)*
 
 *Tf-idf term weighting or normalized log-transformed simple frequencies*
 
-Built using [Eclipse Mars (4.5.0)](https://www.eclipse.org) & [Java development kit 1.8.0 update 60](https://www.oracle.com/java/) 
+Built using [Eclipse Mars (4.5.0)](http://www.eclipse.org/downloads/) & [Java development kit 1.8.0 update 60](http://www.oracle.com/technetwork/java/javase/downloads/index.html) 
 
 ---
 
