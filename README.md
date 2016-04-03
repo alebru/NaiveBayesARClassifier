@@ -2,7 +2,7 @@
 
 **Alexander Brusmark** (brusmark@gmail.com)
 
-*A classifier for bug reports based on the [Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) method (for use with bugzilla CSV-format bug report data)*
+*A classifier for bug reports based on the [Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) method (for use with [Bugzilla](https://www.bugzilla.org/) CSV-format bug report data)*
 
 *Tf-idf term weighting or normalized log-transformed simple frequencies*
 
@@ -11,21 +11,31 @@ Built using [Eclipse Mars (4.5.0)](http://www.eclipse.org/downloads/) & [Java de
 ---
 
 ### How to use
+__Train__ - creates a model from an input .csv dataset
 
-* cutoffvalue - choose the number of examples/class required for the class to be included in the model (set 1 to include all examples)
-* freq - use normalized term frequencies based on counts
+__Traintest__ - Splits input dataset (80%/20%) into a training set and a test set, reports classification accuracy
+
+__Classify__ - Classifies an input .csv file with bug reports on the form *["bug product", "bug component", "bug summary"]* and outputs .csv file on the form *["bug product", "bug component", "bug summary", "__suggested developer__"]*
+
+* Lower limit - choose the lower limit of examples/class required for the class to be included in the model (set to 1 to include all examples)
+* Upper limit - choose the upper limit of examples/class required for the class to be included in the model (set to value above highest value in dataset to include all examples)
+* freq - use normalized simple term frequencies as term weights
 * tfidf - use the term weighting scheme [tf-idf](https://en.wikipedia.org/wiki/Tf–idf)
 
 #### From command-prompt
 
-java -jar [jar file].jar [test|train|traintest] [inputfile.csv] [cutoffvalue (integer)] [freq|tfidf]
-
+java -jar [jar file].jar [|train|traintest|classify] [inputfile.csv] [lower limit (integer)] [upper limit (integer)] [freq|tfidf]
 
 __Example:__
 
-*java -jar classifier.jar traintest loadsofbugreports.csv 30 tfidf*
+*java -jar NB_ReportClassifier.jar traintest loadsofbugreports.csv 30 150 tfidf*
 
 
+#### File output
+
+The model is saved in the file *model.dat* (in the same directory the classifier)
+
+The results of the classification is saved in *classified_bugreports.csv*
 
 
 
