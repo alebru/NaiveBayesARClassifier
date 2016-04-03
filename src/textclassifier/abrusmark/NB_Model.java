@@ -18,6 +18,7 @@ public class NB_Model {
 	
 	public NB_Model(TextProcessor documentsProcessed) {
 		testData = documentsProcessed.getTermsByDocuments();
+		
 	}
 	
 	public NB_Model() {
@@ -28,7 +29,6 @@ public class NB_Model {
 		try {
 			f_out = new FileOutputStream("model.dat");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -38,7 +38,6 @@ public class NB_Model {
 		/* Write model (object) to disk */
 		System.out.println("Saved model");
 		obj_out.writeObject(trainingModel);
-		
 		f_out.close();
 		obj_out.close();
 	}
@@ -51,12 +50,16 @@ public class NB_Model {
 		ObjectInputStream obj_in = new ObjectInputStream (f_in);
 
 		/* Read an object */
+
 		Object obj = obj_in.readObject();
 		
 		if (obj instanceof Features) {
 			Features mod = (Features) obj;
 			trainingModel = mod;
-			System.out.println("Loaded model");
+
 		}
+		
+		System.out.println("Loaded model");
+		
 	}
 }

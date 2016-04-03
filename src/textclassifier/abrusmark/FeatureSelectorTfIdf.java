@@ -4,6 +4,7 @@
 
 package textclassifier.abrusmark;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,7 +17,7 @@ public class FeatureSelectorTfidf
 	private static Map<String, List<String>> documentsByClass;
 	private static HashSet<String> uniqueDocuments;
 	private static Map<Integer, List<String>> termsByDocuments;
-	private static Map<Integer, String> goldstandard;
+	private static Goldstandard goldstandard;
 	private Map<String, Integer> termFreqAllDocuments;
 	private Features featureSet;
 
@@ -26,45 +27,53 @@ public class FeatureSelectorTfidf
 	private Map<String, Integer> documentsByClassFreq;
 	private Map<String, Integer> termsByAllDocumentsCount;
 	private Map<String, Double> termsInDocumentsCount;
-
+	private ArrayList<List<String>> fullDocuments;
+	
 	int termCount;
-
+	double docLengthSum;
+	
 	String classLabel;
 	double tempCountWordsInClass;
 	double classProbabilityValue;
 
 	double classProbability;
 	double termProbability;
-
+	
+	String termWeightMethod;
+	
 	static {
 		FeatureSelectorTfidf.allDocuments = null;
 		FeatureSelectorTfidf.documentsByClass = null;
 		FeatureSelectorTfidf.uniqueDocuments = null;
 	}
-	public FeatureSelectorTfidf(TextProcessor processedDocuments) {
+	public FeatureSelectorTfidf(String termWeights, String limitLow, String limitHigh, TextProcessor processedDocuments) {
 		allDocumentsFreq = new HashMap<String, Integer>();
 		documentsByClassFreq = new HashMap<String, Integer>();
 		termsByAllDocumentsCount = new HashMap<String, Integer>();
+		termWeightMethod = termWeights;
 
-
-		featureSet = new Features();
+		featureSet = new Features(termWeightMethod, limitLow, limitHigh);
 		allClassesFreq = processedDocuments.getSortedClasses();
-		FeatureSelectorTfidf.goldstandard = processedDocuments.getGoldstandard();
+//		FeatureSelectorTfidf.goldstandard = processedDocuments.getGoldstandard();
 		FeatureSelectorTfidf.allDocuments = processedDocuments.getAllDocuments();
 		FeatureSelectorTfidf.documentsByClass = processedDocuments.getDocumentsByClass();
 		FeatureSelectorTfidf.uniqueDocuments = processedDocuments.getUniqueDocuments();
 		FeatureSelectorTfidf.termsByDocuments = processedDocuments.getTermsByDocuments();
+		fullDocuments = processedDocuments.getFullDocuments();
+		
+		docLengths();
 		freqClasses();
 		featuresByClass(); 
 		featuresProbPerClass();
 	}
-	public FeatureSelectorTfidf(TextProcessorStringdata processedDocuments) {
+	public FeatureSelectorTfidf(String termWeights, String limitLow, String limitHigh, TextProcessorStringdata processedDocuments) {
 		allDocumentsFreq = new HashMap<String, Integer>();
 		documentsByClassFreq = new HashMap<String, Integer>();
 		termsByAllDocumentsCount = new HashMap<String, Integer>();
 		goldstandard = processedDocuments.getGoldstandard();
-
-		featureSet = new Features();
+		termWeightMethod = termWeights;
+		
+		featureSet = new Features(termWeightMethod, limitLow, limitHigh);
 		allClassesFreq = processedDocuments.getSortedClasses();
 		featureSet.setAllClassesFreq(allClassesFreq);
 		termFreqAllDocuments = processedDocuments.getTermFreqAllDocuments();
@@ -73,7 +82,9 @@ public class FeatureSelectorTfidf
 		FeatureSelectorTfidf.documentsByClass = processedDocuments.getDocumentsByClass();
 		FeatureSelectorTfidf.uniqueDocuments = processedDocuments.getUniqueDocuments();
 		FeatureSelectorTfidf.termsByDocuments = processedDocuments.getTermsByDocuments();
-
+		fullDocuments = processedDocuments.getFullDocuments();
+		
+		docLengths();
 		freqClasses();
 		featuresByClass(); 
 		featuresProbPerClass();
@@ -82,7 +93,14 @@ public class FeatureSelectorTfidf
 	public Features returnFeatures() {
 		return featureSet;
 	}
-
+	
+	public void docLengths() {
+		docLengthSum = 0.0;
+		for (List<String> document : fullDocuments) {
+			docLengthSum += document.size();
+		}
+		featureSet.setLengthOfDocs(docLengthSum);
+	}
 
 	public void freqClasses() {
 		for (Map.Entry<String, Integer> entry : allClassesFreq.entrySet()) {
@@ -124,8 +142,8 @@ public class FeatureSelectorTfidf
 				for (Map.Entry<String, Double> wordFreqInClass: entry.getValue().entrySet()) {
 					tempCountWordsInClass += wordFreqInClass.getValue();
 				}
-				termProbability = (innerEntry.getValue() * Math.log((uniqueDocuments.size()/termFreqAllDocuments.get(innerEntry.getKey()))));
-				innerEntry.setValue(termProbability);   			
+				termProbability = ((1+Math.log(innerEntry.getValue())) * Math.log(1+(uniqueDocuments.size()/termFreqAllDocuments.get(innerEntry.getKey()))));
+				innerEntry.setValue(termProbability);			
 			}	
 		}
 

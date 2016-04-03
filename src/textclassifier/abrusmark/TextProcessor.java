@@ -11,7 +11,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.HashSet;
 import java.util.List;
 
@@ -28,8 +30,6 @@ public class TextProcessor {
 
 	private String[] tempDoc;
 
-	private Map<Integer, String> goldstandard = new HashMap<Integer, String>();
-	
 	private List<String> allClasses;
 	private List<String> uniqueClasses;
 	private HashSet<String> uniqueDocuments;
@@ -37,8 +37,13 @@ public class TextProcessor {
 	private Map<String, List<String>> documentsByClass;
 	private Map<Integer, List<String>> termsByDocuments;
 	private ArrayList<String> allDocuments;
+	private ArrayList<List<String>> fullDocuments;
 	private ArrayList<String> scrappedTokens;
 
+	private Goldstandard goldstandard = new Goldstandard();
+	private ResultSet classifiedreports = new ResultSet();
+	BugReport bug;
+	
 	private List<String> tempTermList = null;
 
 	public TextProcessor(String option, final String csvFile) {
@@ -51,11 +56,11 @@ public class TextProcessor {
 		sortedClasses = new HashMap<String, Integer>();
 		documentsByClass = new HashMap<String, List<String>>();
 		allDocuments = new ArrayList<String>();
+		fullDocuments = new ArrayList<List<String>>();
 		scrappedTokens = new ArrayList<String>();
 		textData = csvFile;
 
 		tokenize(option);
-		System.out.println(getUniqueClasses().size());
 		returnDocuments();
 	}
 
@@ -71,6 +76,9 @@ public class TextProcessor {
 				++countDocs;
 
 				final String[] cols = line.split(",");
+				bug = new BugReport(Integer.parseInt(cols[0]), cols[6], cols[3], cols[1], cols[2]);
+				goldstandard.AddReport(bug);
+				
 				for (int i = 0; i < 1; ++i) {
 					allClasses.add(cols[3]);
 					tempDoc = cols[6].split(" ");
@@ -87,7 +95,6 @@ public class TextProcessor {
 							documentsByClass.get(cols[3]).add(string);
 							tempTermList.add(string);
 						}
-						goldstandard.put(Integer.valueOf(cols[0]), cols[3]);
 					} else {
 						for (String string : tempDoc) {
 							string = string.replaceAll(
@@ -99,12 +106,12 @@ public class TextProcessor {
 							documentsByClass.get(cols[3]).add(string);
 							tempTermList.add(string);
 						}
-						goldstandard.put(Integer.valueOf(cols[0]), cols[3]);
 					}
 
-					if (option.equalsIgnoreCase("test")) {
+					if (option.equalsIgnoreCase("test") || option.equalsIgnoreCase("train")) {
 						Collections.sort(tempTermList);
 						termsByDocuments.put(Integer.valueOf(cols[0]), tempTermList);
+						fullDocuments.add(tempTermList);
 					}
 
 				}
@@ -119,9 +126,6 @@ public class TextProcessor {
 			}
 			uniqueDocuments = new HashSet<String>(allDocuments);
 			
-//			for (Map.Entry<Integer, String> entry : goldstandard.entrySet()) {
-//				System.out.println(entry.getKey()+ " :  " +entry.getValue());
-//			}
 		} catch (FileNotFoundException e) {
 			
 			e.printStackTrace();
@@ -153,10 +157,14 @@ public class TextProcessor {
 		this.allClasses = allClasses;
 	}
 
-	public Map<Integer, String> getGoldstandard() {
+	public Goldstandard getGoldstandard() {
 		return goldstandard;
 	}
-
+	
+	public ResultSet getClassifiedreports() {
+		return classifiedreports;
+	}
+	
 	public List<String> getUniqueClasses() {
 		return uniqueClasses;
 	}
@@ -203,6 +211,10 @@ public class TextProcessor {
 
 	public void setAllDocuments(ArrayList<String> allDocuments) {
 		this.allDocuments = allDocuments;
+	}
+	
+	public ArrayList<List<String>> getFullDocuments() {
+		return fullDocuments;
 	}
 
 	public TextProcessor returnDocuments() {

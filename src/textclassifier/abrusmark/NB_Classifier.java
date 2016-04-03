@@ -5,12 +5,15 @@
 
 package textclassifier.abrusmark;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class NB_Classifier {
 	Features ClassifierFeatures;
-	private Map<Integer, String> goldStandard;
+	private Goldstandard goldstandard;
+	private ResultSet classifiedreports;
 	Map<Map<String, Double>, List<Double>> tempValues;
 	Map<Integer, List<String>> testData;
 	Map<String, Integer> sortedClasses;
@@ -40,14 +43,16 @@ public class NB_Classifier {
 
 	public NB_Classifier(String[] commands, TextProcessor documentsProcessed) {
 		testData = documentsProcessed.getTermsByDocuments();
-		goldStandard = documentsProcessed.getGoldstandard();
+		goldstandard = documentsProcessed.getGoldstandard();
+		classifiedreports = documentsProcessed.getClassifiedreports();
 		cmds = commands;
 	}
 
 	public NB_Classifier(String[] commands, TextProcessorStringdata documentsProcessed) {
 		testData = documentsProcessed.getTermsByDocuments();
+		classifiedreports = documentsProcessed.getClassifiedreports();
 		sortedClasses = documentsProcessed.getSortedClasses();
-		goldStandard = documentsProcessed.getGoldstandard();
+		goldstandard = documentsProcessed.getGoldstandard();
 		cmds = commands;
 	}
 
@@ -68,8 +73,7 @@ public class NB_Classifier {
 		try {
 			ClassifierModel.saveToDisk();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e.getMessage();
 		}
 	}
 
@@ -79,8 +83,7 @@ public class NB_Classifier {
 			ClassifierModel = new NB_Model();
 			ClassifierModel.loadFromDisk();
 		} catch (ClassNotFoundException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e.getMessage();
 		} 
 		System.out.println("\n");
 		System.out.println("Running classifier...");
@@ -127,7 +130,7 @@ public class NB_Classifier {
 
 				/* Checks to see if new probability value > previous probability, updates maxProbability accordingly*/
 
-				if (cmds[3].equalsIgnoreCase("tfidf")) {
+				if (ClassifierModel.trainingModel.termWeightMethod.equalsIgnoreCase("tfidf")) {
 					if (probabilityCalc > maxProbability) {
 						maxProbability = probabilityCalc;
 						bestClass = entry2.getKey().keySet().toArray()[0].toString();
@@ -147,35 +150,49 @@ public class NB_Classifier {
 
 		for (Map.Entry<Integer, String> entry : results.entrySet()) {
 
-			for (Map.Entry<Integer, String> entry2: goldStandard.entrySet()) {
-
-				if ((entry.getKey().equals(entry2.getKey()) && (entry.getValue().equals(entry2.getValue())))) {
+			for (BugReport bug : goldstandard.ClassedReports) {
+				if (entry.getKey().equals(bug.bug_id) && (entry.getValue().equals(bug.bug_developer))) {
+					classifiedreports.AddReport(bug);
 					correct++;
+					}
 				}
 			}
-		}
-		
+
 		accuracy = correct/results.size();
 		double percent = Math.round((100.0 * accuracy));
-		
-		
+
 		
 		System.out.println("\n");
 		System.out.println("Input: " + cmds[1]);
 		System.out.println("\n");
-		System.out.println("--------------------------------------------------------------");
-		System.out.println("#Documents in training data: " +"\t" + ClassifierModel.trainingModel.featureFreqAllClasses);
-		System.out.println("#Classes in training data: " +"\t" +ClassifierModel.trainingModel.getAllClassesFreq().size());
+		System.out.println("--------------------------------------------------------------------------");
+		System.out.println("<<<" +"\t" + "Model settings" +"\t" + ">>>");
+		System.out.println("\n");
+		System.out.println("#Documents in training data: " + "\t" + ClassifierModel.trainingModel.featureFreqAllClasses);
+		System.out.println("#Classes in training data: " + "\t" + ClassifierModel.trainingModel.getAllClassesFreq().size());
+		System.out.println("\n");
+		System.out.println("Terms/document in training data (avg.): " + "\t" + (ClassifierModel.trainingModel.featureLengthOfDocs/ClassifierModel.trainingModel.featureFreqAllClasses));
+		System.out.println("\n");
+		System.out.println("Cut-off (lower - upper):" +"\t" + ClassifierModel.trainingModel.cutOfflow+" - " +ClassifierModel.trainingModel.cutOffhigh);
+		System.out.println("Term-weighting:" +"\t" + "\t" +ClassifierModel.trainingModel.termWeightMethod);
+		System.out.println("\n");
+		System.out.println("\n");
+		System.out.println("<<<" +"\t" + "Test data" +"\t" + ">>>");
 		System.out.println("\n");
 		System.out.println("#Documents in test data: " +"\t" + testData.size());
-		System.out.println("#Classes in test data: " +"\t\t" +ClassifierModel.trainingModel.getAllClassesFreq().size());
-		System.out.println("\n");
-		System.out.println("Cut-off:" +"\t" + cmds[2]);
-		System.out.println("Term-weighting:" +"\t" + cmds[3]);
-		System.out.println("\n");
-		System.out.println("Accuracy:" + "\t" + String.format("%.0f %%",percent)+ "  (" + accuracy+")");
-		System.out.println("--------------------------------------------------------------");
+		System.out.println("#Classes in test data: " +"\t" + ClassifierModel.trainingModel.getAllClassesFreq().size());
 		System.out.println("\n");
 		System.out.println("\n");
+		System.out.println("<<<" +"\t" + "Results" +"\t" + ">>>");
+		System.out.println("\n");
+		System.out.println("Accuracy:" +"\t" + "\t" + String.format("%.0f %%",percent)+ "  (" + accuracy+")");
+		System.out.println("--------------------------------------------------------------------------");
+		System.out.println("\n");
+		
+		try(PrintWriter out = new PrintWriter("classified_bugreports.csv")  ){
+		    out.println(classifiedreports.toString());
+		} catch (FileNotFoundException e) {
+			e.getLocalizedMessage();
+		}
 	}
 }

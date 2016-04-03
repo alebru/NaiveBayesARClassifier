@@ -31,8 +31,7 @@ public class TextProcessorStringdata {
 
 
 	private String[] tempDoc;
-	private Map<Integer, String> goldstandard = new HashMap<Integer, String>();
-
+	
 	private List<String> allClasses;
 	private List<String> uniqueClasses;
 
@@ -41,10 +40,15 @@ public class TextProcessorStringdata {
 	private Map<String, List<String>> documentsByClass;
 	private Map<Integer, List<String>> termsByDocuments;
 	private Map<String, Integer> termFreqAllDocuments;
+	private ArrayList<List<String>> fullDocuments;
 	private ArrayList<String> allDocuments;
 	private ArrayList<String> scrappedTokens;
-
-	List<String> stopWords = new ArrayList<>(Arrays.asList("a", "about", "above", "above", "across", "after", "afterwards", "again", "against", "all", "almost", "alone", "along", "already", "also","although","always","am","among", "amongst", "amoungst", "amount",  "an", "and", "another", "any","anyhow","anyone","anything","anyway", "anywhere", "are", "around", "as",  "at", "back","be","became", "because","become","becomes", "becoming", "been", "before", "beforehand", "behind", "being", "below", "beside", "besides", "between", "beyond", "bill", "both", "bottom","but", "by", "call", "can", "cannot", "cant", "co", "con", "could", "couldnt", "cry", "de", "describe", "detail", "do", "done", "down", "due", "during", "each", "eg", "eight", "either", "eleven","else", "elsewhere", "empty", "enough", "etc", "even", "ever", "every", "everyone", "everything", "everywhere", "except", "few", "fifteen", "fify", "fill", "find", "fire", "first", "five", "for", "former", "formerly", "forty", "found", "four", "from", "front", "full", "further", "get", "give", "go", "had", "has", "hasnt", "have", "he", "hence", "her", "here", "hereafter", "hereby", "herein", "hereupon", "hers", "herself", "him", "himself", "his", "how", "however", "hundred", "ie", "if", "in", "inc", "indeed", "interest", "into", "is", "it", "its", "itself", "keep", "last", "latter", "latterly", "least", "less", "ltd", "made", "many", "may", "me", "meanwhile", "might", "mill", "mine", "more", "moreover", "most", "mostly", "move", "much", "must", "my", "myself", "name", "namely", "neither", "never", "nevertheless", "next", "nine", "no", "nobody", "none", "noone", "nor", "not", "nothing", "now", "nowhere", "of", "off", "often", "on", "once", "one", "only", "onto", "or", "other", "others", "otherwise", "our", "ours", "ourselves", "out", "over", "own","part", "per", "perhaps", "please", "put", "rather", "re", "same", "see", "seem", "seemed", "seeming", "seems", "serious", "several", "she", "should", "show", "side", "since", "sincere", "six", "sixty", "so", "some", "somehow", "someone", "something", "sometime", "sometimes", "somewhere", "still", "such", "system", "take", "ten", "than", "that", "the", "their", "them", "themselves", "then", "thence", "there", "thereafter", "thereby", "therefore", "therein", "thereupon", "these", "they", "thickv", "thin", "third", "this", "those", "though", "three", "through", "throughout", "thru", "thus", "to", "together", "too", "top", "toward", "towards", "twelve", "twenty", "two", "un", "under", "until", "up", "upon", "us", "very", "via", "was", "we", "well", "were", "what", "whatever", "when", "whence", "whenever", "where", "whereafter", "whereas", "whereby", "wherein", "whereupon", "wherever", "whether", "which", "while", "whither", "who", "whoever", "whole", "whom", "whose", "why", "will", "with", "within", "without", "would", "yet", "you", "your", "yours", "yourself", "yourselves", "the"));
+	
+	private Goldstandard goldstandard = new Goldstandard();
+	private ResultSet classifiedreports = new ResultSet();
+	BugReport bug;
+	
+	List<String> stopWords = new ArrayList<>(Arrays.asList("about","above","across","after","again","against","all","almost","alone","along","already","also","although","always","among","an","and","another","any","anybody","anyone","anything","anywhere","are","area","areas","around","as","ask","asked","asking","asks","at","away","back","backed","backing","backs","be","became","because","become","becomes","been","before","began","behind","being","beings","best","better","between","big","both","but","by","came","can","cannot","case","cases","certain","certainly","clear","clearly","come","could","did","differ","different","differently","do","does","done","down","down","downed","downing","downs","during","each","early","either","end","ended","ending","ends","enough","even","evenly","ever","every","everybody","everyone","everything","everywhere","face","faces","fact","facts","far","felt","few","find","finds","first","for","four","from","full","fully","further","furthered","furthering","furthers","gave","general","generally","get","gets","give","given","gives","go","going","good","goods","got","great","greater","greatest","group","grouped","grouping","groups","had","has","have","having","he","her","here","herself","high","high","high","higher","highest","him","himself","his","how","however","if","important","in","interest","interested","interesting","interests","into","is","it","its","itself","just","keep","keeps","kind","knew","know","known","knows","large","largely","last","later","latest","least","less","let","lets","like","likely","long","longer","longest","made","make","making","man","many","may","me","member","members","men","might","more","most","mostly","mr","mrs","much","must","my","myself","necessary","need","needed","needing","needs","never","new","new","newer","newest","next","no","nobody","non","noone","not","nothing","now","nowhere","number","numbers","of","off","often","old","older","oldest","on","once","one","only","open","opened","opening","opens","or","order","ordered","ordering","orders","other","others","our","out","over","part","parted","parting","parts","per","perhaps","place","places","point","pointed","pointing","points","possible","present","presented","presenting","presents","problem","problems","put","puts","quite","rather","really","right","right","room","rooms","said","same","saw","say","says","second","seconds","see","seem","seemed","seeming","seems","sees","several","shall","she","should","show","showed","showing","shows","side","sides","since","small","smaller","smallest","so","some","somebody","someone","something","somewhere","state","states","still","still","such","sure","take","taken","than","that","the","their","them","then","there","therefore","these","they","thing","things","think","thinks","this","those","though","thought","thoughts","three","through","thus","to","today","together","too","took","toward","turn","turned","turning","turns","two","under","until","up","upon","us","use","used","uses","very","want","wanted","wanting","wants","was","way","ways","we","well","wells","went","were","what","when","where","whether","which","while","who","whole","whose","why","will","with","within","without","work","worked","working","works","would","y","year","years","yet","you","young","younger","youngest","your","yours"));
 	private List<String> tempTermList = null;
 
 	public TextProcessorStringdata(String option, String weightMethod, final String stringData) {
@@ -58,6 +62,7 @@ public class TextProcessorStringdata {
 		sortedClasses = new HashMap<String, Integer>();
 		documentsByClass = new HashMap<String, List<String>>();
 		allDocuments = new ArrayList<String>();
+		fullDocuments = new ArrayList<List<String>>();
 		scrappedTokens = new ArrayList<String>();
 		textData = stringData;
 		tokenize(option, weightMethod);
@@ -72,7 +77,6 @@ public class TextProcessorStringdata {
 		removedTokens = 0;
 		Scanner dataSc = null;
 		dataSc = new Scanner(textData);
-
 		/* While (data.Sc.hasNextLine == true) */
 		
 
@@ -80,10 +84,12 @@ public class TextProcessorStringdata {
 			tempTermList = new ArrayList<String>();
 			++countDocs;
 			line = dataSc.nextLine();
-
 			/* Split the line into columns, use "," as delimiter */
 			final String[] cols = line.split(",");
-
+			
+			bug = new BugReport(Integer.parseInt(cols[0]), cols[6], cols[3], cols[1], cols[2]);
+			goldstandard.AddReport(bug);
+			
 			for (int i = 0; i < 1; ++i) {
 				allClasses.add(cols[3]);
 				tempDoc = cols[6].split(" ");
@@ -115,7 +121,7 @@ public class TextProcessorStringdata {
 						/* TF-IDF weight calculation (if option 'tfidf' passed as argument)
 						 * The sum of documents containing words in vocabulary */
 						
-						if (weightMethod.equalsIgnoreCase("tfidf") && option.equalsIgnoreCase("train")) {
+						if (!stopWords.contains(string) && weightMethod.equalsIgnoreCase("tfidf") && option.equalsIgnoreCase("train")) {
 							allDocuments.add(string);
 							documentsByClass.get(cols[3]).add(string);
 							tempTermList.add(string);
@@ -138,8 +144,8 @@ public class TextProcessorStringdata {
 					 * goldstandard (HashMap<Integer, String>)
 					 */
 					
-					String idOfDoc = cols[0].replaceAll("\"", "");
-					goldstandard.put(Integer.valueOf(idOfDoc), cols[3]);
+//					String idOfDoc = cols[0].replaceAll("\"", "");
+//					goldstandard.put(Integer.valueOf(idOfDoc), cols[3]);
 				} 
 
 			
@@ -165,7 +171,7 @@ public class TextProcessorStringdata {
 						/* TF-IDF weight calculation (if option 'tfidf' passed as argument)
 						 * The sum of documents containing words in vocabulary */
 
-						if (weightMethod.equalsIgnoreCase("tfidf") && option.equalsIgnoreCase("train")) {
+						if (!stopWords.contains(string) && weightMethod.equalsIgnoreCase("tfidf") && option.equalsIgnoreCase("train")) {
 							allDocuments.add(string);
 							documentsByClass.get(cols[3]).add(string);
 							tempTermList.add(string);
@@ -187,13 +193,14 @@ public class TextProcessorStringdata {
 					 * goldstandard (HashMap<Integer, String>)
 					 */
 					
-					String idOfDoc = cols[0].replaceAll("\"", "");
-					goldstandard.put(Integer.valueOf(idOfDoc), cols[3]);
+//					String idOfDoc = cols[0].replaceAll("\"", "");
+//					goldstandard.put(Integer.valueOf(idOfDoc), cols[3]);
 				}
 
-				if (option.equalsIgnoreCase("test")) {
+				if (option.equalsIgnoreCase("test") || option.equalsIgnoreCase("train")) {
 					Collections.sort(tempTermList);
 					termsByDocuments.put(Integer.valueOf(cols[0]), tempTermList);
+					fullDocuments.add(tempTermList);
 				}
 
 			}
@@ -223,8 +230,16 @@ public class TextProcessorStringdata {
 		this.allClasses = allClasses;
 	}
 
-	public Map<Integer, String> getGoldstandard() {
+	public Goldstandard getGoldstandard() {
 		return goldstandard;
+	}
+
+	public ResultSet getClassifiedreports() {
+		return classifiedreports;
+	}
+
+	public void setClassifiedreports(ResultSet classifiedreports) {
+		this.classifiedreports = classifiedreports;
 	}
 
 	public List<String> getUniqueClasses() {
@@ -277,6 +292,10 @@ public class TextProcessorStringdata {
 
 	public void setAllDocuments(ArrayList<String> allDocuments) {
 		this.allDocuments = allDocuments;
+	}
+	
+	public ArrayList<List<String>> getFullDocuments() {
+		return fullDocuments;
 	}
 
 	public TextProcessorStringdata returnDocuments() {
