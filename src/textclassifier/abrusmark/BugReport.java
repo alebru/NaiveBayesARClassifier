@@ -1,11 +1,16 @@
 package textclassifier.abrusmark;
 
+import java.util.List;
+
 public class BugReport{
 	int bug_id;
 	String bug_summary;
+	String bug_summary_pre_textprocessing;
 	String bug_developer;
 	String bug_product;
 	String bug_component;
+	
+	List<String> bug_splitSummaryText;
 	
 	String bug_stringified;
 	
@@ -16,6 +21,24 @@ public class BugReport{
 		bug_product = product;
 		bug_component = component;
 	}
+	public BugReport(String summary, String developer, String product, String component) {
+		bug_summary = summary;
+		bug_developer = developer;
+		bug_product = product;
+		bug_component = component;
+	}
+	public BugReport(String product, String component, List<String> splitSummaryText, String originalSummary) {
+		bug_splitSummaryText = splitSummaryText;
+		bug_summary_pre_textprocessing = originalSummary;
+		bug_product = product;
+		bug_component = component;
+	}
+	public BugReport(String product, String component, String summary) {
+		bug_summary = summary;
+		bug_product = product;
+		bug_component = component;
+	}
+	
 	@Override
 	public String toString() {
 		bug_stringified = this.bug_product + "," + this.bug_component + ","

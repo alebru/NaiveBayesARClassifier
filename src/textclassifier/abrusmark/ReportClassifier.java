@@ -52,7 +52,8 @@ public class ReportClassifier
 			final TextProcessorStringdata testSet = new TextProcessorStringdata("test", args[4], sampleAndSplit.testSet);
 			
 			/* If argument "tfidf" is passed, NB_Classifier runs tfidf-evaluation */
-
+			commands[0] = "test";
+			
 			final NB_Classifier classifierTestInstance = new NB_Classifier(commands, testSet);
 			classifierTestInstance.test();
 		}
@@ -77,7 +78,7 @@ public class ReportClassifier
 			}
 		}
 
-		if (args[0].equalsIgnoreCase("test")) {
+		if (args[0].equalsIgnoreCase("classify")) {
 			commands[0] = args[0];
 			commands[1] = args[1];
 		
@@ -88,7 +89,7 @@ public class ReportClassifier
 			classifierInstance.test();
 		}
 
-		else if (!(args[0].equalsIgnoreCase("train") || args[0].equalsIgnoreCase("test") || args[0].equalsIgnoreCase("traintest"))){
+		else if (!(args[0].equalsIgnoreCase("train") || args[0].equalsIgnoreCase("classify") || args[0].equalsIgnoreCase("traintest"))){
 			System.out.println("Supply classifier with command 'traintest', 'train' or 'test' followed by dataset in csv-format  (+lower and upper limits for examples/class, if 'train' or 'traintest' is used)" + "\n" + "(Example: 'java -jar classify.jar traintest dataset.csv 20 80 tfidf') ");
 		}
 	}
