@@ -40,4 +40,6 @@ The results of the classification is saved in *classified_bugreports.csv*
 * Classify - all predictions are included in the output file
 
 
+#### Datasets
 
+Example datasets in the Bugzilla CSV format is available in the archive *[Bugreport dataset.zip](Bugreport%20datasets.zip)*
