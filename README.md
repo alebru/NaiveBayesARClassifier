@@ -2,7 +2,7 @@
 
 **Alexander Brusmark** (brusmark@gmail.com)
 
-*A classifier for bug reports based on the [Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) method (for use with [Bugzilla](https://www.bugzilla.org/) CSV-format bug report data)*
+> *A classifier for bug reports built on an implementation of the Multinomial [Naive Bayes](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) classification method (for use with [Bugzilla](https://www.bugzilla.org/) CSV-format bug report data)*
 
 *Tf-idf term weighting or normalized log-transformed simple frequencies*
 
@@ -33,9 +33,13 @@ __Example:__
 
 #### File output
 
-The model is saved in the file *model.dat* (in the same directory the classifier)
+The model is saved in the file *model.dat* (in the same directory as the classifier)
 
 The results of the classification is saved in *classified_bugreports.csv*
+* Traintest - all _correct_ predictions are included in the output file
+* Classify - all predictions are included in the output file
 
 
+#### Datasets
 
+Example datasets in the Bugzilla CSV format is available in the archive *[Bugreport dataset.zip](Bugreport%20datasets.zip)*
