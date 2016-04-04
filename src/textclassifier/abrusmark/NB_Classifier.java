@@ -83,9 +83,6 @@ public class NB_Classifier {
 	}
 
 	public void test() {
-		for (String string : cmds) {
-			System.out.println(string);
-		}
 		try {
 			ClassifierModel = new NB_Model();
 			ClassifierModel.loadFromDisk();

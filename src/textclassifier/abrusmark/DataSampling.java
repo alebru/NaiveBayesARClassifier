@@ -45,8 +45,6 @@ public class DataSampling {
 		textData = csvFile;
 		cutOfflow = Integer.valueOf(lowfreq);
 		cutOffhigh = Integer.valueOf(highfreq);
-		System.out.println(cutOfflow);
-		System.out.println(cutOffhigh);
 		splitData();
 	}
 
