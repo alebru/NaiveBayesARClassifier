@@ -35,11 +35,11 @@ __Example:__
 
 The model is saved in the file *model.dat* (in the same directory as the classifier)
 
-The results of the classification is saved in *classified_bugreports.csv*
+The results of the predictions are saved in *classified_bugreports.csv*
 * Traintest - all _correct_ predictions are included in the output file
 * Classify - all predictions are included in the output file
 
 
 #### Datasets
 
-Example datasets in the Bugzilla CSV format is available in the archive *[Bugreport dataset.zip](Bugreport%20datasets.zip)*
+Example datasets in the Bugzilla CSV format are available in the archive *[Bugreport dataset.zip](Bugreport%20datasets.zip)*
